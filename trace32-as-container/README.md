@@ -27,6 +27,7 @@ podman run --rm --interactive --tty --volume /tmp/.X11-unix:/tmp/.X11-unix --env
 - UDP `10000` used for Intercom `--publish <hostport>:10000`
 - TCP `20000` used for RemoteAPI `--publish <hostport>:20000`
 ## Examples
+### PowerDebug via Ethernet 
 Start TRACE32, connect to PowerDebug via Ethernet. Expose RemoteAPI Port to localhost (127.0.0.1) port 20000 IPv4 only.
 ```
 cat << EOF > config.t32
@@ -45,3 +46,18 @@ EOF
 
 podman run --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} --volume .:/t32work --publish 127.0.0.1:20000:20000 trace32
 ```
+### PowerDebug via USB
+Start TRACE32, connect to PowerDebug via USB.
+```
+cat << EOF > config.t32
+PBI=
+USB
+NODE=E0123456789
+EOF
+
+podman run --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} --volume .:/t32work --volume /dev/lauterbach/:/dev/lauterbach --volume /dev/bus/usb:/dev/bus/usb trace32
+```
+
+Note: Please make sure the host machine has the Lauterbach udev rules installed.
+
+
