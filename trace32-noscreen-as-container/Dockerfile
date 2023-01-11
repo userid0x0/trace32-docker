@@ -2,6 +2,7 @@ FROM debian:bullseye
 
 ARG T32ZIP
 ARG T32EXE
+ARG UNZIP_ARG
 
 # simply run
 # mkdir debian; touch debian/control
@@ -15,7 +16,7 @@ RUN apt-get update \
 
 COPY ${T32ZIP} /tmp/trace32.zip
 RUN cd /opt \
-  && unzip -q /tmp/trace32.zip -d /opt/t32 \
+  && unzip -q ${UNZIP_ARG} /tmp/trace32.zip -d /opt/t32 \
   && chmod +x /opt/t32/bin/pc_linux64/t32m* \
   && rm /tmp/trace32.zip \
   && mkdir -p /t32work \

@@ -8,9 +8,9 @@ Requirements:
 ```
 podman build --tag trace32 --build-arg T32ZIP=<file>.zip --build-arg T32EXE=<executable>  .
 ```
-Example use `trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip` and start `t32marm`.
+Example use `trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip`, password `1234` and start `t32marm`.
 ```
-podman build --tag trace32 --build-arg T32ZIP=trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip --build-arg T32EXE=t32marm  .
+podman build --tag trace32 --build-arg T32ZIP=trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip --build-arg UNZIP_ARG="-P 1234" --build-arg T32EXE=t32marm  .
 ```
 ## Test
 Without any parameters the container should start a TRACE32 instruction set simulator and runs as script `work-settings.cmm` that implements a simple Hello World example.
@@ -36,6 +36,7 @@ TRACE32 for ARM
 ### Build Arguments
 - `T32ZIP` TRACE32 ZIP file to unpack in container
 - `T32EXE` TRACE32 executable to start within container
+- `UNZIP_ARG` Arguments for Linux `unzip` e.g. `-P <password>`
 
 ### Volumes
 - `/t32work` should contain the files
