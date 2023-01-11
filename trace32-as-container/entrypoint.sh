@@ -22,9 +22,4 @@ if [ ! -d /tmp/.X11-unix ]; then
   warn "Directory '/tmp/.X11-unix' missing. Invoke podman/docker with '--volume /tmp/.X11-unix:/tmp/.X11-unix'"
 fi
 
-if [ ! -d /opt/t32/bin/pc_linux64 ]; then
-  error "Directory '/opt/t32' empty. Invoke podman/docker with '--volume <path to>:/opt/t32'"
-  exit 1
-fi
-
-exec ${@}
+exec /opt/t32/bin/pc_linux64/${T32EXE} ${@}

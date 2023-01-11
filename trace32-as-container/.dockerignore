@@ -1,3 +1,5 @@
 *
 !Dockerfile
 !trace32*.zip
+!entrypoint.sh
+!config-example.t32

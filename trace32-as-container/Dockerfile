@@ -22,25 +22,9 @@ RUN cd /opt \
   && unzip -q /tmp/trace32.zip -d /opt/t32 \
   && chmod +x /opt/t32/bin/pc_linux64/t32m* \
   && rm /tmp/trace32.zip \
-  && mkdir -p /t32work \
-  && (echo "#!/bin/bash\nexec /opt/t32/bin/pc_linux64/${T32EXE} \${@}" > /entrypoint.sh) \
-  && chmod +x /entrypoint.sh
-
-# generate a super simple config file using TRACE32 Simulator
-RUN echo "PBI=SIM\n\
-\n\
-; T32 Intercom\n\
-IC=NETASSIST\n\
-PORT=10000\n\
-\n\
-; T32 API Access (UDP)\n\
-RCL=NETASSIST\n\
-PORT=20000\n\
-PACKLEN=1024\n\
-\n\
-; T32 API Access (TCP)\n\
-RCL=NETTCP\n\
-PORT=20000\n" > /t32work/config.t32
+  && mkdir -p /t32work
+COPY entrypoint.sh /entrypoint.sh
+COPY config-example.t32 /t32work/config.t32
 
 # Intercom
 EXPOSE 10000/udp
@@ -48,6 +32,7 @@ EXPOSE 10000/udp
 EXPOSE 20000/tcp
 
 ENV T32SYS=/opt/t32
+ENV T32EXE=${T32EXE}
 WORKDIR /t32work
 
 ENTRYPOINT [ "/entrypoint.sh" ]
