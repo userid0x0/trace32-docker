@@ -1,5 +1,9 @@
 # TRACE32 Dockerfile
-A container without GUI support. The resulting container does NOT require Qt/Motif therefore the `T32SCREENSO=t32screenoff.so` is used.
+A container without GUI support. The resulting container does NOT require Qt/Motif.
+
+Requirements:
+* TRACE32 Build >= `N.2022.12.000154741`
+* TRACE32 Build < `N.2022.12.000154741` require `t32screenoff.so` that is available from Lauterbach upon request
 ## Building
 ```
 podman build --tag trace32 --build-arg T32ZIP=<file>.zip --build-arg T32EXE=<executable>  .
