@@ -4,7 +4,8 @@ FROM debian:bullseye
 # mkdir debian; touch debian/control
 # dpkg-shlibdeps -O t32m??? t32screenqt5.so
 RUN apt-get update \
- && apt-get install --no-install-recommends -y \
+  && apt-get install --no-install-recommends -y \
+      libcurl4 \
       libqt5core5a \
       libqt5gui5 \
       libqt5printsupport5 \
@@ -12,7 +13,7 @@ RUN apt-get update \
       libuuid1 \
       unzip \
       zlib1g \
- && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /t32work /opt/t32
 COPY entrypoint.sh /entrypoint.sh

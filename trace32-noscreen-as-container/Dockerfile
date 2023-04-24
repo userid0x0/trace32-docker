@@ -1,25 +1,37 @@
-FROM debian:bullseye
+FROM debian:bullseye as extractor
 
 ARG T32ZIP
-ARG T32EXE
 ARG UNZIP_ARG
 
-# simply run
-# mkdir debian; touch debian/control
-# dpkg-shlibdeps -O t32m??? t32screenoff.so
 RUN apt-get update \
- && apt-get install --no-install-recommends -y \
-      libuuid1 \
+  && apt-get install --no-install-recommends -y \
       unzip \
-      zlib1g \
- && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 COPY ${T32ZIP} /tmp/trace32.zip
 RUN cd /opt \
   && unzip -q ${UNZIP_ARG} /tmp/trace32.zip -d /opt/t32 \
   && chmod +x /opt/t32/bin/pc_linux64/t32m* \
-  && rm /tmp/trace32.zip \
-  && mkdir -p /t32work \
+  && rm /tmp/trace32.zip
+
+FROM debian:bullseye
+
+ARG T32EXE
+
+# simply run
+# mkdir debian; touch debian/control
+# dpkg-shlibdeps -O t32m??? t32screenoff.so
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+      libcurl4 \
+      libuuid1 \
+      zlib1g \
+  && rm -rf /var/lib/apt/lists/*
+
+# copy TRACE32
+COPY --from=extractor /opt/t32 /opt/t32
+
+RUN mkdir -p /t32work \
   && (echo "#!/bin/bash\nexec /opt/t32/bin/pc_linux64/${T32EXE} \${@}" > /entrypoint.sh) \
   && chmod +x /entrypoint.sh
 
