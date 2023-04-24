@@ -1,0 +1,6 @@
+*
+!Dockerfile
+!trace32*.zip
+!start-t32.sh
+!config-example.t32
+!user-preferences.cfg
