@@ -39,7 +39,9 @@ COPY user-preferences.cfg /config/.trace32/user-preferences.cfg
 
 RUN sed -i '/id="root-menu"/a   <item label="TRACE32">\n<action name="Execute"><execute>start-t32</execute></action>\n</item>' /defaults/menu.xml \
   && (echo "start-t32" > /defaults/autostart) \
-  && chmod +x /usr/local/bin/start-t32
+  && chmod +x /usr/local/bin/start-t32 \
+  && chown -R abc:abc /config/.trace32 \
+  && chown -R abc:abc /t32work
 
 # Intercom
 EXPOSE 10000/udp
