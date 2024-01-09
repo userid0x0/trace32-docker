@@ -1,20 +1,20 @@
 # TRACE32 Dockerfile
-A container without GUI support. The resulting container does NOT require Qt/Motif.
+A image with TRACE32 without GUI support. The resulting image does NOT require Qt/Motif.
 
 Requirements:
 * TRACE32 Build >= `N.2022.12.000154741`
 * TRACE32 Build < `N.2022.12.000154741` require `t32screenoff.so` that is available from Lauterbach upon request
 ## Building
-```
+```bash
 podman build --tag trace32 --build-arg T32ZIP=<file>.zip --build-arg T32EXE=<executable>  .
 ```
 Example use `trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip`, password `1234` and start `t32marm`.
-```
+```bash
 podman build --tag trace32 --build-arg T32ZIP=trace32_N_2023_01_000155374_ARM_FULL_20230110132230.zip --build-arg UNZIP_ARG="-P 1234" --build-arg T32EXE=t32marm  .
 ```
 ## Test
 Without any parameters the container should start a TRACE32 instruction set simulator and runs as script `work-settings.cmm` that implements a simple Hello World example.
-```
+```bash
 podman run --rm --interactive --tty trace32
 ```
 the output should look as follows
@@ -48,7 +48,7 @@ TRACE32 for ARM
 ## Examples
 ### PowerDebug via Ethernet 
 Start TRACE32, connect to PowerDebug via Ethernet. Expose RemoteAPI Port to localhost (127.0.0.1) port 20000 IPv4 only.
-```
+```bash
 cat << EOF > config.t32
 PBI=
 NET
@@ -67,7 +67,7 @@ podman run --volume .:/t32work --publish 127.0.0.1:20000:20000 trace32 -s <your_
 ```
 ### PowerDebug via USB
 Start TRACE32, connect to PowerDebug via USB.
-```
+```bash
 cat << EOF > config.t32
 PBI=
 USB

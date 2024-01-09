@@ -1,12 +1,12 @@
 # TRACE32 Dockerfile
-Run TRACE32 with an Container but TRACE32 itself is stored on the host.
+Run TRACE32 within a Container but TRACE32 itself is stored on the host.
 ## Building
-```
+```bash
 podman build --tag trace32 .
 ```
 ## Test
 Per default the container tries to start a `t32marm` instruction set simulator.
-```
+```bash
 podman run --rm --interactive --tty --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} --volume <path to trace32>:/opt/t32 trace32
 ```
 ## Configuration
@@ -24,7 +24,7 @@ podman run --rm --interactive --tty --volume /tmp/.X11-unix:/tmp/.X11-unix --env
 ## Examples
 ### PowerDebug via Ethernet 
 Start TRACE32 for TriCore (`t32mtc`), connect to PowerDebug via Ethernet. Expose RemoteAPI Port to localhost (127.0.0.1) port 20000 IPv4 only. TRACE32 is installed in `/t32sw`.
-```
+```bash
 cat << EOF > config.t32
 PBI=
 NET
@@ -43,7 +43,7 @@ podman run --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} --vol
 ```
 ### PowerDebug via USB
 Start TRACE32 for ARM (`t32marm`), connect to PowerDebug via USB. TRACE32 is installed in `/t32sw`.
-```
+```bash
 cat << EOF > config.t32
 PBI=
 USB
