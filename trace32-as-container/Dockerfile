@@ -16,8 +16,6 @@ RUN cd /opt \
 
 FROM debian:bullseye
 
-ARG T32EXE
-
 # simply run
 # mkdir debian; touch debian/control
 # dpkg-shlibdeps -O t32m??? t32screenqt5.so
@@ -44,6 +42,7 @@ EXPOSE 10000/udp
 # RemoteAPI (TCP)
 EXPOSE 20000/tcp
 
+ARG T32EXE=t32marm
 ENV T32SYS=/opt/t32
 ENV T32EXE=${T32EXE}
 WORKDIR /t32work
