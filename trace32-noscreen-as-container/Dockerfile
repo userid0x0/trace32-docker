@@ -2,6 +2,7 @@ FROM debian:bullseye as extractor
 
 ARG T32ZIP
 ARG UNZIP_ARG
+ARG TARGETARCH
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
@@ -11,12 +12,10 @@ RUN apt-get update \
 COPY ${T32ZIP} /tmp/trace32.zip
 RUN cd /opt \
   && unzip -q ${UNZIP_ARG} /tmp/trace32.zip -d /opt/t32 \
-  && chmod +x /opt/t32/bin/pc_linux64/t32m* \
+  && (([ "$TARGETARCH" = "arm64" ] && chmod +x /opt/t32/bin/linux-aarch64/t32m*) || chmod +x /opt/t32/bin/pc_linux64/t32m*) \
   && rm /tmp/trace32.zip
 
 FROM debian:bullseye
-
-ARG T32EXE
 
 # simply run
 # mkdir debian; touch debian/control
@@ -31,25 +30,9 @@ RUN apt-get update \
 # copy TRACE32
 COPY --from=extractor /opt/t32 /opt/t32
 
-RUN mkdir -p /t32work \
-  && (echo "#!/bin/bash\nexec /opt/t32/bin/pc_linux64/${T32EXE} \${@}" > /entrypoint.sh) \
-  && chmod +x /entrypoint.sh
-
-# generate a super simple config file using TRACE32 Simulator
-RUN echo "PBI=SIM\n\
-\n\
-; T32 Intercom\n\
-IC=NETASSIST\n\
-PORT=10000\n\
-\n\
-; T32 API Access (UDP)\n\
-RCL=NETASSIST\n\
-PORT=20000\n\
-PACKLEN=1024\n\
-\n\
-; T32 API Access (TCP)\n\
-RCL=NETTCP\n\
-PORT=20000\n" > /t32work/config.t32
+RUN mkdir -p /t32work
+COPY entrypoint.sh /entrypoint.sh
+COPY config-example.t32 /t32work/config.t32
 
 # generate a hello-world example script - work-settings.cmm is started upon TRACE32 startup
 RUN echo "\n\
@@ -59,11 +42,17 @@ PRINT \"Hello World on \" OS.NAME()\n\
 WinPRINT.VERSION.SOFTWARE\n\
 QUIT\n" > /t32work/work-settings.cmm
 
+ARG TARGETARCH
+RUN (([ "$TARGETARCH" = "arm64" ] && sed -i 's/pc_linux64/linux-aarch64/g' /entrypoint.sh) || true) \
+  && chmod +x /entrypoint.sh
+
 # Intercom
 EXPOSE 10000/udp
 # RemoteAPI (TCP)
 EXPOSE 20000/tcp
 
+ARG T32EXE=t32marm
+ENV T32EXE=${T32EXE}
 ENV T32SYS=/opt/t32
 ENV T32SCREENSO=t32screenoff.so
 ENV T32SCREENOFF=1

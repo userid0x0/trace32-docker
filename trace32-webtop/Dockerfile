@@ -2,6 +2,7 @@ FROM lscr.io/linuxserver/webtop:ubuntu-openbox as extractor
 
 ARG T32ZIP
 ARG UNZIP_ARG
+ARG TARGETARCH
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
@@ -11,7 +12,7 @@ RUN apt-get update \
 COPY ${T32ZIP} /tmp/trace32.zip
 RUN cd /opt \
   && unzip -q ${UNZIP_ARG} /tmp/trace32.zip -d /opt/t32 \
-  && chmod +x /opt/t32/bin/pc_linux64/t32m* \
+    && (([ "$TARGETARCH" = "arm64" ] && chmod +x /opt/t32/bin/linux-aarch64/t32m*) || chmod +x /opt/t32/bin/pc_linux64/t32m*) \
   && rm /tmp/trace32.zip
 
 FROM lscr.io/linuxserver/webtop:ubuntu-openbox
@@ -37,8 +38,10 @@ COPY start-t32.sh /usr/local/bin/start-t32
 COPY config-example.t32 /t32work/config.t32
 COPY user-preferences.cfg /config/.trace32/user-preferences.cfg
 
+ARG TARGETARCH
 RUN sed -i '/id="root-menu"/a   <item label="TRACE32">\n<action name="Execute"><execute>start-t32</execute></action>\n</item>' /defaults/menu.xml \
   && (echo "start-t32" > /defaults/autostart) \
+  && (([ "$TARGETARCH" = "arm64" ] && sed -i 's/pc_linux64/linux-aarch64/g' /usr/local/bin/start-t32) || true) \
   && chmod +x /usr/local/bin/start-t32 \
   && chown -R abc:abc /config/.trace32 \
   && chown -R abc:abc /t32work

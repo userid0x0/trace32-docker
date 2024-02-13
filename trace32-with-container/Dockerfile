@@ -19,6 +19,10 @@ RUN mkdir -p /t32work /opt/t32
 COPY entrypoint.sh /entrypoint.sh
 COPY config-example.t32 /t32work/config.t32
 
+ARG TARGETARCH
+RUN (([ "$TARGETARCH" = "arm64" ] && sed -i 's/pc_linux64/linux-aarch64/g' /entrypoint.sh) || true) \
+  && chmod +x /entrypoint.sh
+
 # Volumes
 ## TRACE32 working directory
 VOLUME /t32work
@@ -31,7 +35,6 @@ EXPOSE 10000/udp
 EXPOSE 20000/tcp
 
 ENV T32SYS=/opt/t32
-ENV PATH="/opt/t32/bin/pc_linux64:${PATH}"
 WORKDIR /t32work
 
 ENTRYPOINT [ "/entrypoint.sh" ]

@@ -27,4 +27,6 @@ if [ ! -d /opt/t32/bin/pc_linux64 ]; then
   exit 1
 fi
 
+export PATH="/opt/t32/bin/pc_linux64:${PATH}"
+
 exec ${@}
