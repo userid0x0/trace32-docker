@@ -9,6 +9,7 @@ RUN apt-get update \
       libqt5core5a \
       libqt5gui5 \
       libqt5printsupport5 \
+      libqt5svg5 \
       libqt5widgets5 \
       libuuid1 \
       unzip \
