@@ -1,10 +1,10 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 # simply run
 # mkdir debian; touch debian/control
 # dpkg-shlibdeps -O t32m??? t32screenqt5.so
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y \
+    && apt-get install --no-install-recommends -y \
       libcurl4 \
       libqt5core5a \
       libqt5gui5 \
@@ -14,11 +14,18 @@ RUN apt-get update \
       libuuid1 \
       unzip \
       zlib1g \
-  && rm -rf /var/lib/apt/lists/*
+      # X-Server related
+      xauth \
+      xxd \
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 RUN mkdir -p /t32work /opt/t32
 COPY entrypoint.sh /entrypoint.sh
 COPY config-example.t32 /t32work/config.t32
+ADD --chown=root:root \
+    --chmod=555 \
+    https://gist.github.com/userid0x0/6e4fc3b424358ed98ad3fcece9d4a797/raw/xauthority-wildcard.sh \
+    /usr/local/bin/xauthority-wildcard.sh
 
 ARG TARGETARCH
 RUN (([ "$TARGETARCH" = "arm64" ] && sed -i 's/pc_linux64/linux-aarch64/g' /entrypoint.sh) || true) \
@@ -31,9 +38,9 @@ VOLUME /t32work
 VOLUME /opt/t32
 
 # Intercom
-EXPOSE 10000/udp
 # RemoteAPI (TCP)
-EXPOSE 20000/tcp
+EXPOSE 10000/udp \
+       20000/tcp
 
 ENV T32SYS=/opt/t32
 WORKDIR /t32work

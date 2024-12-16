@@ -1,31 +1,33 @@
-FROM debian:bullseye as extractor
+FROM debian:bookworm as extractor
 
-ARG T32ZIP
-ARG UNZIP_ARG
-ARG TARGETARCH
+ARG T32ZIP \
+    UNZIP_ARG \
+    TARGETARCH
 
-RUN apt-get update \
-  && apt-get install --no-install-recommends -y \
+RUN apt update \
+    && apt install --no-install-recommends -y \
       unzip \
-  && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-COPY ${T32ZIP} /tmp/trace32.zip
-RUN cd /opt \
-  && unzip -q ${UNZIP_ARG} /tmp/trace32.zip -d /opt/t32 \
-  && (([ "$TARGETARCH" = "arm64" ] && chmod +x /opt/t32/bin/linux-aarch64/t32m*) || chmod +x /opt/t32/bin/pc_linux64/t32m*) \
-  && rm /tmp/trace32.zip
+RUN --mount=type=bind,target=/context \
+    cd /opt \
+    && unzip -q ${UNZIP_ARG} /context/${T32ZIP} -d /opt/t32 \
+    && (([ "$TARGETARCH" = "arm64" ] && chmod +x /opt/t32/bin/linux-aarch64/t32m*) || chmod +x /opt/t32/bin/pc_linux64/t32m*)
 
-FROM debian:bullseye
+RUN rm -rf /opt/t32/{windows,windows64,macosx64} \
+    && (([ "$TARGETARCH" = "arm64" ] && rm -rf /opt/t32/bin/pc_linux64) || rm -rf /opt/t32/bin/linux-aarch64)
+
+FROM debian:bookworm
 
 # simply run
 # mkdir debian; touch debian/control
 # dpkg-shlibdeps -O t32m??? t32screenoff.so
-RUN apt-get update \
-  && apt-get install --no-install-recommends -y \
+RUN apt update \
+    && apt install --no-install-recommends -y \
       libcurl4 \
       libuuid1 \
       zlib1g \
-  && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # copy TRACE32
 COPY --from=extractor /opt/t32 /opt/t32
@@ -44,18 +46,18 @@ QUIT\n" > /t32work/work-settings.cmm
 
 ARG TARGETARCH
 RUN (([ "$TARGETARCH" = "arm64" ] && sed -i 's/pc_linux64/linux-aarch64/g' /entrypoint.sh) || true) \
-  && chmod +x /entrypoint.sh
+    && chmod +x /entrypoint.sh
 
 # Intercom
-EXPOSE 10000/udp
 # RemoteAPI (TCP)
-EXPOSE 20000/tcp
+EXPOSE 10000/udp \
+       20000/tcp
 
 ARG T32EXE=t32marm
-ENV T32EXE=${T32EXE}
-ENV T32SYS=/opt/t32
-ENV T32SCREENSO=t32screenoff.so
-ENV T32SCREENOFF=1
+ENV T32EXE=${T32EXE} \
+    T32SYS=/opt/t32 \
+    T32SCREENSO=t32screenoff.so \
+    T32SCREENOFF=1
 WORKDIR /t32work
 
 ENTRYPOINT [ "/entrypoint.sh" ]

@@ -11,6 +11,7 @@ podman build --tag trace32 --build-arg T32ZIP=trace32_N_2023_01_000155374_ARM_FU
 ## Test
 Without any parameters the container should start a TRACE32 instruction set simulator.
 ```bash
+xhost +SI:localuser:$(id -un)
 podman run --rm --interactive --tty --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} trace32
 ```
 ## Configuration

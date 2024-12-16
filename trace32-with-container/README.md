@@ -7,6 +7,7 @@ podman build --tag trace32 .
 ## Test
 Per default the container tries to start a `t32marm` instruction set simulator.
 ```bash
+xhost +SI:localuser:$(id -un)
 podman run --rm --interactive --tty --volume /tmp/.X11-unix:/tmp/.X11-unix --env DISPLAY=${DISPLAY} --volume <path to trace32>:/opt/t32 trace32
 ```
 ## Configuration

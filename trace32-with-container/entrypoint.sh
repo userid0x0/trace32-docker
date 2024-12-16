@@ -2,7 +2,7 @@
 
 warn () {
   local ORANGE NC
-  ORANGE='\033[3;31m'
+  ORANGE='\033[3;33m'
   NC='\033[0m'
   echo -e "${ORANGE}Warning:${NC} ${@}"
 }
@@ -26,6 +26,9 @@ if [ ! -d /opt/t32/bin/pc_linux64 ]; then
   error "Directory '/opt/t32' empty. Invoke podman/docker with '--volume <path to>:/opt/t32'"
   exit 1
 fi
+
+# process the hosts .Xauthority file mapped to /tmp/Xauthority-host (if exists)
+source /usr/local/bin/xauthority-wildcard.sh
 
 export PATH="/opt/t32/bin/pc_linux64:${PATH}"
 
